@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Te amo mucho ❤️</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&display=swap');
+    :root{--bg:#fff5fb;--accent:#ff4d8a;--card:#ffffff;}
+    *{box-sizing:border-box}
+    body{font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;min-height:100vh;margin:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff5fb 0%, #fff 100%);}
+    .card{width:min(720px,94vw);background:var(--card);padding:36px;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,0.08);text-align:center}
+    h1{margin:0 0 8px;font-weight:800;color:#222}
+    p.lead{margin:0 0 20px;color:#666}
+    .form-row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+    input[name="name"]{padding:14px 16px;border-radius:12px;border:2px solid rgba(0,0,0,0.06);width:300px;font-size:16px;outline:none}
+    button{background:linear-gradient(90deg,var(--accent),#ff6ea5);color:white;border:none;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(255,77,138,0.15);transition:transform .14s ease}
+    button:active{transform:translateY(2px)}
+    .heart{font-size:48px;margin-top:18px;opacity:0;transform:scale(0.8);transition:all .35s cubic-bezier(.2,.9,.3,1)}
+    .reveal{opacity:1;transform:scale(1)}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);opacity:0;transition:opacity .25s;}
+    .popup{position:relative;z-index:10;background:linear-gradient(180deg,#fff 0%,#fff8fb 100%);padding:28px;border-radius:16px;min-width:320px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.18);transform:translateY(12px) scale(.98);opacity:0;transition:all .32s cubic-bezier(.2,.9,.3,1)}
+    .modal.show .overlay{opacity:1;pointer-events:auto}
+    .modal.show .popup{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+    .popup h2{margin:0 0 8px;font-size:22px;color:#222}
+    .popup p{margin:0 0 12px;color:#444}
+    .close{background:transparent;border:none;font-weight:700;padding:8px 12px;border-radius:10px;cursor:pointer}
+
+    /* confetti simple */
+    .confetti-piece{position:fixed;width:10px;height:16px;opacity:0;z-index:9999;border-radius:2px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Un detalle para mi mami 💖</h1>
+    <p class="lead">Escriba su nombre y haz click — l ✨</p>
+    <div class="form-row">
+      <input id="nameInput" name="name" placeholder="Escribe su nombre..." aria-label="Nombre de ella" />
+      <button id="loveBtn">Decirle que la amo</button>
+    </div>
+    <div class="heart" id="heart">❤️</div>
+  </div>
+
+  <!-- modal -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="overlay"></div>
+    <div class="popup" role="dialog" aria-modal="true">
+      <h2 id="popupTitle">Te amo mucho</h2>
+      <p id="popupText">Eres lo mejor de mi vida.</p>
+      <button class="close" id="closeBtn">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('loveBtn');
+    const input = document.getElementById('nameInput');
+    const heart = document.getElementById('heart');
+    const modal = document.getElementById('modal');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupText = document.getElementById('popupText');
+    const closeBtn = document.getElementById('closeBtn');
+
+    function random(min, max){return Math.random()*(max-min)+min}
+
+    function makeConfetti(count){
+      const colors = ['#ff7aa2','#ff4d8a','#ffd166','#fff1f6','#ff9ec2'];
+      for(let i=0;i<count;i++){
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        el.style.left = (random(10,90)) + 'vw';
+        el.style.top = '-10vh';
+        el.style.transform = 'rotate('+random(0,360)+'deg)';
+        el.style.opacity = 1;
+        document.body.appendChild(el);
+        // animate
+        const fall = el.animate([
+          {transform: 'translateY(0) rotate('+random(0,360)+'deg)', opacity:1},
+          {transform: 'translateY('+random(60,120)+'vh) rotate('+random(360,720)+'deg)', opacity:0.9}
+        ],{duration:random(1600,3000),easing:'cubic-bezier(.2,.9,.3,1)'});
+        fall.onfinish = ()=> el.remove();
+      }
+    }
+
+    function showLove(){
+      const name = input.value.trim();
+      const displayName = name ? name : 'mi vida';
+      popupTitle.textContent = `${displayName}, ¡te amo muchísimo!`;
+      popupText.textContent = `Eres mi todo. Gracias por existir.`;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+      heart.classList.add('reveal');
+      makeConfetti(28);
+      // little heartbeat animation
+      heart.animate([
+        {transform: 'scale(0.9)'},
+        {transform: 'scale(1.15)'},
+        {transform: 'scale(1)'}
+      ],{duration:700,iterations:2,easing:'ease-out'});
+    }
+
+    btn.addEventListener('click', ()=>{
+      showLove();
+    });
+
+    input.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter') showLove();
+    });
+
+    closeBtn.addEventListener('click', ()=>{
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+      heart.classList.remove('reveal');
+    });
+
+    // accessibility: click outside to close
+    document.querySelector('.overlay').addEventListener('click', ()=>{
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden','true');
+      heart.classList.remove('reveal');
+    });
+  </script>
+</body>
+</html>
